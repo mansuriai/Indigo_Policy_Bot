@@ -6,6 +6,11 @@ import numpy as np
 from utils.config import config
 from utils.s3_manager import S3Manager
 
+#################
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
+####################
+
 
 class VectorStore:
     def __init__(self):
