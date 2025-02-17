@@ -12,4 +12,4 @@ redis>=4.5.0
 rank-bm25>=0.2.2 
 asyncio>=3.4.3
 boto3>=1.28.0
-streamlit-cloud-extras>=0.1.0
+streamlit-extras
