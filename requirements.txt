@@ -12,5 +12,5 @@ redis>=4.5.0
 rank-bm25>=0.2.2 
 asyncio>=3.4.3
 boto3>=1.28.0
-install db-sqlite3>=3.45.3
+db-sqlite3>=3.45.3
 streamlit-extras
