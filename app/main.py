@@ -7,6 +7,12 @@ import os, sys
 from urllib.parse import urlencode
 
 
+#################
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
+####################
+
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.apikey import OPENAIAPI
 os.environ["OPENAI_API_KEY"] = OPENAIAPI
