@@ -8,8 +8,8 @@ from urllib.parse import urlencode
 from pinecone import Pinecone, ServerlessSpec
 
 #################
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
