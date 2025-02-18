@@ -40,15 +40,15 @@ class Config:
 
 
     #####S3 configurations
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-    AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+    # AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    # AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    # AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
+    # S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
     
-    ###### S3 paths
-    S3_EMBEDDINGS_PREFIX = "embeddings/"
-    S3_DOCUMENTS_PREFIX = "documents/"
-    S3_VECTORDB_PREFIX = "vectordb/"
+    # ###### S3 paths
+    # S3_EMBEDDINGS_PREFIX = "embeddings/"
+    # S3_DOCUMENTS_PREFIX = "documents/"
+    # S3_VECTORDB_PREFIX = "vectordb/"
     
     ########### Temporary local storage
     TEMP_DIR = BASE_DIR / "temp"

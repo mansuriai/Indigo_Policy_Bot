@@ -21,6 +21,8 @@ class VectorStore:
             environment=config.PINECONE_ENVIRONMENT
         )
 
+        print(f"{config.PINECONE_API_KEY} and {config.PINECONE_ENVIRONMENT} and {config.PINECONE_INDEX_NAME}")
+
         if config.PINECONE_INDEX_NAME not in pc.list_indexes().names():
             pc.create_index(
                 name=config.PINECONE_INDEX_NAME,
