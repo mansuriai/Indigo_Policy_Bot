@@ -29,6 +29,13 @@ class Config:
     PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
     # Pinecone settings
     PINECONE_INDEX_NAME = "document-embeddings"
+
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY not found in environment variables")
+    if not PINECONE_API_KEY:
+        raise ValueError("PINECONE_API_KEY not found in environment variables")
+    if not PINECONE_ENVIRONMENT:
+        raise ValueError("PINECONE_ENVIRONMENT not found in environment variables")
     
     # App settings
     APP_TITLE = "Indigo Intelli RAG"

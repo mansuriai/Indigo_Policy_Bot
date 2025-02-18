@@ -33,34 +33,111 @@ from components.chat import render_chat_interface
 
 ###### pine cone changes ###################
 # Add environment variables check
-def check_environment():
-    required_vars = [
-        "OPENAI_API_KEY",
-        "PINECONE_API_KEY",
-        "PINECONE_ENVIRONMENT"
-    ]
+# def check_environment():
+#     required_vars = [
+#         "OPENAI_API_KEY",
+#         "PINECONE_API_KEY",
+#         "PINECONE_ENVIRONMENT"
+#     ]
     
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
+#     missing_vars = [var for var in required_vars if not os.getenv(var)]
     
-    if missing_vars:
-        st.error(f"Missing required environment variables: {', '.join(missing_vars)}")
-        st.stop()
+#     if missing_vars:
+#         st.error(f"Missing required environment variables: {', '.join(missing_vars)}")
+#         st.stop()
     
 
 ###########################################
 
 # Initialize components with error handling
+
+## Old Working ##
+# @st.cache_resource
+# def initialize_components():
+#     try:
+#         return {
+#             'embedding_manager': EmbeddingManager(),
+#             'vector_store': VectorStore(),
+#             'llm_manager': LLMManager()
+#         }
+#     except Exception as e:
+#         st.error(f"Error initializing components: {str(e)}")
+#         return None
+
+def check_environment():
+    """Check if all required environment variables are set."""
+    missing_vars = []
+    
+    if not config.OPENAI_API_KEY:
+        missing_vars.append("OPENAI_API_KEY")
+    if not config.PINECONE_API_KEY:
+        missing_vars.append("PINECONE_API_KEY")
+    if not config.PINECONE_ENVIRONMENT:
+        missing_vars.append("PINECONE_ENVIRONMENT")
+    
+    if missing_vars:
+        error_msg = f"Missing required environment variables: {', '.join(missing_vars)}\n"
+        error_msg += "Please ensure these variables are set in your .env file or environment."
+        raise ValueError(error_msg)
+
+# Update the initialize_components function
 @st.cache_resource
 def initialize_components():
     try:
+        # Check environment variables first
+        check_environment()
+        
+        # Initialize Pinecone
+        # pinecone.init(
+        #     api_key=config.PINECONE_API_KEY,
+        #     environment=config.PINECONE_ENVIRONMENT
+        # )
+        pc = Pinecone(
+            api_key=config.PINECONE_API_KEY,
+            environment=config.PINECONE_ENVIRONMENT
+        )
+        
         return {
             'embedding_manager': EmbeddingManager(),
             'vector_store': VectorStore(),
             'llm_manager': LLMManager()
         }
     except Exception as e:
-        st.error(f"Error initializing components: {str(e)}")
+        st.error(f"Initialization Error: {str(e)}")
+        st.info("Please check your .env file and ensure all required API keys are set correctly.")
         return None
+    
+
+
+###
+
+        # pc = Pinecone(
+        #     api_key=config.PINECONE_API_KEY,
+        #     environment=config.PINECONE_ENVIRONMENT
+        # )
+
+        # if config.PINECONE_INDEX_NAME not in pc.list_indexes().names():
+        #     pc.create_index(
+        #         name=config.PINECONE_INDEX_NAME,
+        #         dimension=768,
+        #         metric='cosine',
+        #         spec=ServerlessSpec(
+        #             cloud='aws',
+        #             region='us-east-1'
+        #         )
+        #     )
+        
+        # self.index = pc.Index(config.PINECONE_INDEX_NAME)
+        # self._initialize_cache()
+
+###
+
+
+# Add this to help debug environment variables (temporary)
+if st.sidebar.checkbox("Debug Environment Variables"):
+    st.sidebar.write("OpenAI API Key:", "✓ Set" if config.OPENAI_API_KEY else "✗ Missing")
+    st.sidebar.write("Pinecone API Key:", "✓ Set" if config.PINECONE_API_KEY else "✗ Missing")
+    st.sidebar.write("Pinecone Environment:", "✓ Set" if config.PINECONE_ENVIRONMENT else "✗ Missing")
 
 components = initialize_components()
 
