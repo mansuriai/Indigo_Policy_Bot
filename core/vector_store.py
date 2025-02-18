@@ -84,8 +84,8 @@ class VectorStore:
     def search(self, query: str, embedding: List[float], k: int = 3) -> List[Dict]:
         """Search for similar documents in Pinecone with logging."""
         try:
-            st.write("Debug: Searching Pinecone index...")
-            st.write(f"Debug: Query length: {len(embedding)} dimensions")
+            # st.write("Debug: Searching Pinecone index...")
+            # st.write(f"Debug: Query length: {len(embedding)} dimensions")
             
             # Query Pinecone
             results = self.index.query(
