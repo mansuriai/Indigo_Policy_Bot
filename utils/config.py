@@ -25,6 +25,10 @@ class Config:
     
     # API Keys
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+    PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
+    # Pinecone settings
+    PINECONE_INDEX_NAME = "document-embeddings"
     
     # App settings
     APP_TITLE = "Indigo Intelli RAG"

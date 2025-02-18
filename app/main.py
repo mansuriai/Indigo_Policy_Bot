@@ -5,11 +5,11 @@ import time
 from typing import List, Dict
 import os, sys
 from urllib.parse import urlencode
-
+from pinecone import Pinecone, ServerlessSpec
 
 #################
-import sys
-sys.modules["sqlite3"] = __import__("pysqlite3")
+# import sys
+# sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
@@ -30,6 +30,24 @@ from core.vector_store import VectorStore
 from core.llm import LLMManager
 from components.chat import render_chat_interface
 
+
+###### pine cone changes ###################
+# Add environment variables check
+def check_environment():
+    required_vars = [
+        "OPENAI_API_KEY",
+        "PINECONE_API_KEY",
+        "PINECONE_ENVIRONMENT"
+    ]
+    
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    
+    if missing_vars:
+        st.error(f"Missing required environment variables: {', '.join(missing_vars)}")
+        st.stop()
+    
+
+###########################################
 
 # Initialize components with error handling
 @st.cache_resource
@@ -113,6 +131,9 @@ if user_input:
     
     # Rerun to update UI
     st.rerun()
+
+
+
 
 
 
