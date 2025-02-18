@@ -25,8 +25,8 @@ class Config:
     
     # API Keys
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    PINECONE_API_KEY = "pcsk_4GP1q8_AkfsfNVvkMpTE2CP2LnpXinyRvUUwFNdTLC8PbmCZtKANaRAajc6eMRp3rMZWSj" #os.getenv("PINECONE_API_KEY")
-    PINECONE_ENVIRONMENT = "us-east-1" #os.getenv("PINECONE_ENVIRONMENT")
+    PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+    PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT")
     # Pinecone settings
     PINECONE_INDEX_NAME = "document-embeddings"
 

@@ -4,6 +4,7 @@ from typing import List, Dict, Optional
 import chromadb
 from chromadb.config import Settings
 import numpy as np
+import streamlit as st
 from utils.config import config
 # from utils.s3_manager import S3Manager
 
@@ -105,36 +106,65 @@ class VectorStore:
                 })
             
             self.index.upsert(vectors=vectors)
-    
+
     def search(self, query: str, embedding: List[float], k: int = 3) -> List[Dict]:
-        """Search for similar documents in Pinecone with caching."""
-        cache_key = self._get_cache_key(query)
+        """Search for similar documents in Pinecone with logging."""
+        try:
+            st.write("Debug: Searching Pinecone index...")
+            st.write(f"Debug: Query length: {len(embedding)} dimensions")
+            
+            # Query Pinecone
+            results = self.index.query(
+                vector=embedding,
+                top_k=k,
+                include_metadata=True
+            )
+            
+            st.write(f"Debug: Found {len(results.matches)} matches")
+            
+            processed_results = []
+            for match in results.matches:
+                processed_results.append({
+                    'text': match.metadata['text'],
+                    'metadata': {k: v for k, v in match.metadata.items() if k != 'text'},
+                    'distance': 1 - match.score  # Convert cosine similarity to distance
+                })
+            
+            return processed_results
+            
+        except Exception as e:
+            st.error(f"Error during vector search: {str(e)}")
+            raise
+    
+    # def search(self, query: str, embedding: List[float], k: int = 3) -> List[Dict]:
+    #     """Search for similar documents in Pinecone with caching."""
+    #     cache_key = self._get_cache_key(query)
         
-        # Check cache first
-        if cache_key in self.cache:
-            return self.cache[cache_key]
+    #     # Check cache first
+    #     if cache_key in self.cache:
+    #         return self.cache[cache_key]
         
-        # Query Pinecone
-        results = self.index.query(
-            vector=embedding,
-            top_k=k,
-            include_metadata=True
-        )
+    #     # Query Pinecone
+    #     results = self.index.query(
+    #         vector=embedding,
+    #         top_k=k,
+    #         include_metadata=True
+    #     )
         
-        processed_results = []
-        for match in results.matches:
-            processed_results.append({
-                'text': match.metadata['text'],
-                'metadata': {k: v for k, v in match.metadata.items() if k != 'text'},
-                'distance': 1 - match.score  # Convert cosine similarity to distance
-            })
+    #     processed_results = []
+    #     for match in results.matches:
+    #         processed_results.append({
+    #             'text': match.metadata['text'],
+    #             'metadata': {k: v for k, v in match.metadata.items() if k != 'text'},
+    #             'distance': 1 - match.score  # Convert cosine similarity to distance
+    #         })
         
-        # Update cache
-        if len(self.cache) >= self.cache_size:
-            self.cache.pop(next(iter(self.cache)))
-        self.cache[cache_key] = processed_results
+    #     # Update cache
+    #     if len(self.cache) >= self.cache_size:
+    #         self.cache.pop(next(iter(self.cache)))
+    #     self.cache[cache_key] = processed_results
         
-        return processed_results
+    #     return processed_results
     
     #####################################################################
 
