@@ -8,17 +8,17 @@ from urllib.parse import urlencode
 from pinecone import Pinecone, ServerlessSpec
 
 #################
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # from utils.apikey import OPENAIAPI
 from utils.config import config
-os.environ["OPENAI_API_KEY"] = config.OPENAI_API_KEY
+# os.environ["OPENAI_API_KEY"] = config.OPENAI_API_KEY
 
-from utils.config import config
+# from utils.config import config
 
 # Set page config as the first Streamlit command
 st.set_page_config(

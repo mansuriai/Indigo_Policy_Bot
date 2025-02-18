@@ -9,8 +9,8 @@ from utils.config import config
 # from utils.s3_manager import S3Manager
 
 #################
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
