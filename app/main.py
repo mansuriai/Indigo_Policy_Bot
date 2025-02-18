@@ -8,14 +8,15 @@ from urllib.parse import urlencode
 from pinecone import Pinecone, ServerlessSpec
 
 #################
-import sys
-sys.modules["sqlite3"] = __import__("pysqlite3")
+# import sys
+# sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from utils.apikey import OPENAIAPI
-os.environ["OPENAI_API_KEY"] = OPENAIAPI
+# from utils.apikey import OPENAIAPI
+from utils.config import config
+os.environ["OPENAI_API_KEY"] = config.OPENAI_API_KEY
 
 from utils.config import config
 
@@ -86,12 +87,6 @@ def initialize_components():
     try:
         # Check environment variables first
         check_environment()
-        
-        # Initialize Pinecone
-        # pinecone.init(
-        #     api_key=config.PINECONE_API_KEY,
-        #     environment=config.PINECONE_ENVIRONMENT
-        # )
         pc = Pinecone(
             api_key=config.PINECONE_API_KEY,
             environment=config.PINECONE_ENVIRONMENT
@@ -120,37 +115,6 @@ def initialize_components():
         return None
     
 
-
-###
-
-        # pc = Pinecone(
-        #     api_key=config.PINECONE_API_KEY,
-        #     environment=config.PINECONE_ENVIRONMENT
-        # )
-
-        # if config.PINECONE_INDEX_NAME not in pc.list_indexes().names():
-        #     pc.create_index(
-        #         name=config.PINECONE_INDEX_NAME,
-        #         dimension=768,
-        #         metric='cosine',
-        #         spec=ServerlessSpec(
-        #             cloud='aws',
-        #             region='us-east-1'
-        #         )
-        #     )
-        
-        # self.index = pc.Index(config.PINECONE_INDEX_NAME)
-        # self._initialize_cache()
-
-###
-
-
-# # Add this to help debug environment variables (temporary)
-# if st.sidebar.checkbox("Debug Environment Variables"):
-#     st.sidebar.write("OpenAI API Key:", "✓ Set" if config.OPENAI_API_KEY else "✗ Missing")
-#     st.sidebar.write("Pinecone API Key:", "✓ Set" if config.PINECONE_API_KEY else "✗ Missing")
-#     st.sidebar.write("Pinecone Environment:", "✓ Set" if config.PINECONE_ENVIRONMENT else "✗ Missing")
-
 components = initialize_components()
 
 if components is None:
@@ -177,54 +141,6 @@ user_input = render_chat_interface(
     st.session_state.chat_history,
     st.session_state.current_sources
 )
-
-
-########## working ###########
-
-# if user_input:
-#     # Add user message to chat history
-#     st.session_state.chat_history.append({
-#         "role": "user",
-#         "content": user_input
-#     })
-    
-#     # Create a placeholder for the streaming response
-#     with st.chat_message("assistant"):
-#         response_placeholder = st.empty()
-        
-#         try:
-#             # Generate embedding for query
-#             query_embedding = embedding_manager.generate_embeddings([user_input])[0]
-            
-#             # Search for relevant documents
-#             relevant_docs = vector_store.search(
-#                 user_input,
-#                 query_embedding,
-#                 k=st.session_state.context_window
-#             )
-            
-#             # Generate streaming response
-#             response = llm_manager.generate_response(
-#                 user_input,
-#                 relevant_docs,
-#                 st.session_state.chat_history[-st.session_state.max_history:],
-#                 streaming_container=response_placeholder
-#             )
-            
-#             # Update chat history and sources
-#             st.session_state.chat_history.append({
-#                 "role": "assistant",
-#                 "content": response
-#             })
-#             st.session_state.current_sources = relevant_docs
-            
-#         except Exception as e:
-#             st.error(f"An error occurred: {str(e)}")
-    
-#     # Rerun to update UI
-#     st.rerun()
-
-
 
 ################### new
 
@@ -290,3 +206,52 @@ with st.sidebar:
             st.write("Index Statistics:", stats)
         except Exception as e:
             st.error(f"Error fetching index stats: {str(e)}")
+
+
+########## working ###########
+
+# if user_input:
+#     # Add user message to chat history
+#     st.session_state.chat_history.append({
+#         "role": "user",
+#         "content": user_input
+#     })
+    
+#     # Create a placeholder for the streaming response
+#     with st.chat_message("assistant"):
+#         response_placeholder = st.empty()
+        
+#         try:
+#             # Generate embedding for query
+#             query_embedding = embedding_manager.generate_embeddings([user_input])[0]
+            
+#             # Search for relevant documents
+#             relevant_docs = vector_store.search(
+#                 user_input,
+#                 query_embedding,
+#                 k=st.session_state.context_window
+#             )
+            
+#             # Generate streaming response
+#             response = llm_manager.generate_response(
+#                 user_input,
+#                 relevant_docs,
+#                 st.session_state.chat_history[-st.session_state.max_history:],
+#                 streaming_container=response_placeholder
+#             )
+            
+#             # Update chat history and sources
+#             st.session_state.chat_history.append({
+#                 "role": "assistant",
+#                 "content": response
+#             })
+#             st.session_state.current_sources = relevant_docs
+            
+#         except Exception as e:
+#             st.error(f"An error occurred: {str(e)}")
+    
+#     # Rerun to update UI
+#     st.rerun()
+
+
+
