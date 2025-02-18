@@ -114,21 +114,21 @@ if user_input:
         
         try:
             # Generate embedding for query
-            st.write("Debug: Generating query embedding...")
+            # st.write("Debug: Generating query embedding...")
             query_embedding = embedding_manager.generate_embeddings([user_input])[0]
-            st.write(f"Debug: Embedding generated, shape: {len(query_embedding)}")
+            # st.write(f"Debug: Embedding generated, shape: {len(query_embedding)}")
             
             # Search for relevant documents
-            st.write("Debug: Searching for relevant documents...")
+            # st.write("Debug: Searching for relevant documents...")
             relevant_docs = vector_store.search(
                 user_input,
                 query_embedding,
                 k=st.session_state.context_window
             )
-            st.write(f"Debug: Found {len(relevant_docs)} relevant documents")
+            # st.write(f"Debug: Found {len(relevant_docs)} relevant documents")
             
             # Generate streaming response
-            st.write("Debug: Generating LLM response...")
+            # st.write("Debug: Generating LLM response...")
             response = llm_manager.generate_response(
                 user_input,
                 relevant_docs,
@@ -151,13 +151,13 @@ if user_input:
     st.rerun()
 
 # Add a debug section in the sidebar
-with st.sidebar:
-    st.write("### Debug Information")
-    if st.checkbox("Show Debug Info"):
-        st.write("Pinecone Index:", config.PINECONE_INDEX_NAME)
-        try:
-            index = Pinecone.Index(config.PINECONE_INDEX_NAME)
-            stats = index.describe_index_stats()
-            st.write("Index Statistics:", stats)
-        except Exception as e:
-            st.error(f"Error fetching index stats: {str(e)}")
+# with st.sidebar:
+#     st.write("### Debug Information")
+#     if st.checkbox("Show Debug Info"):
+#         st.write("Pinecone Index:", config.PINECONE_INDEX_NAME)
+#         try:
+#             index = Pinecone.Index(config.PINECONE_INDEX_NAME)
+#             stats = index.describe_index_stats()
+#             st.write("Index Statistics:", stats)
+#         except Exception as e:
+#             st.error(f"Error fetching index stats: {str(e)}")
