@@ -64,7 +64,7 @@ def initialize_components():
         # Verify Pinecone index exists and is accessible
         index = pc.Index(config.PINECONE_INDEX_NAME)
         index_stats = index.describe_index_stats()
-        st.sidebar.write(f"Pinecone Index Stats: {index_stats.total_vector_count} vectors")
+        # st.sidebar.write(f"Pinecone Index Stats: {index_stats.total_vector_count} vectors")
         
         return components
     except Exception as e:
@@ -93,6 +93,12 @@ if "max_history" not in st.session_state:
     st.session_state.max_history = 10
 
 st.title(config.APP_TITLE)
+
+# Add button to start new conversation
+if st.button("New Question"):
+    st.session_state.chat_history = []
+    st.session_state.current_sources = []
+    st.rerun()
 
 # Chat interface
 user_input = render_chat_interface(

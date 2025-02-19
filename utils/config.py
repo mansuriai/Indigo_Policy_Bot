@@ -41,7 +41,7 @@ class Config:
         raise ValueError("PINECONE_ENVIRONMENT not found in environment variables")
     
     # App settings
-    APP_TITLE = "Indigo Intelli RAG"
+    APP_TITLE = "IndiGo Policies Chatbot"
     MAX_HISTORY_LENGTH = 10
     
     # Vector DB settings
