@@ -9,8 +9,8 @@ from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
-import sys
-sys.modules["sqlite3"] = __import__("pysqlite3")
+# import sys
+# sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
@@ -26,7 +26,7 @@ st.set_page_config(
 from core.embeddings import EmbeddingManager
 from core.vector_store import VectorStore
 from core.llm import LLMManager
-from components.chat import render_chat_interface
+# from components.chat import render_chat_interface
 
 def check_environment():
     """Check if all required environment variables are set."""
@@ -94,17 +94,31 @@ if "max_history" not in st.session_state:
 
 st.title(config.APP_TITLE)
 
+st.markdown("""
+Get answers to all your IndiGo Airlines related queries, from flight information to 
+travel tips, booking procedures and more.
+""")
+
+
 # Add button to start new conversation
 if st.button("New Question"):
     st.session_state.chat_history = []
     st.session_state.current_sources = []
     st.rerun()
 
-# Chat interface
-user_input = render_chat_interface(
-    st.session_state.chat_history,
-    st.session_state.current_sources
-)
+# # Chat interface
+# user_input = render_chat_interface(
+#     st.session_state.chat_history,
+#     st.session_state.current_sources
+# )
+
+# Chat interface (simplified without source display)
+for message in st.session_state.chat_history:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+# User input
+user_input = st.chat_input("Ask me anything about IndiGo Airlines...")
 
 # Update the query processing in the main chat interface
 if user_input:
@@ -135,12 +149,31 @@ if user_input:
             
             # Generate streaming response
             # st.write("Debug: Generating LLM response...")
+
+            ## working
             response = llm_manager.generate_response(
                 user_input,
                 relevant_docs,
                 st.session_state.chat_history[-st.session_state.max_history:],
                 streaming_container=response_placeholder
             )
+
+            ################ new with distance parameter #############
+            # Add this after retrieving relevant_docs:
+            # filtered_docs = [doc for doc in relevant_docs if doc['distance'] < 0.5]  # Lower distance = more similar
+            # if not filtered_docs:
+            #     response = "I don't have enough relevant information to answer your question accurately."
+            #     # Handle no relevant documents case
+            # else:
+            #     # Generate response using filtered_docs instead of relevant_docs
+            #     response = llm_manager.generate_response(
+            #         user_input,
+            #         filtered_docs,  # Use filtered docs here
+            #         st.session_state.chat_history[-st.session_state.max_history:],
+            #         streaming_container=response_placeholder
+            #     )
+
+
             
             # Update chat history and sources
             st.session_state.chat_history.append({
