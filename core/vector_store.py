@@ -15,8 +15,8 @@ import logging
 
 #################
 ## Please comment this line while working on local machine
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 # Disable SSL verification for urllib3
 # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

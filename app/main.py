@@ -9,8 +9,8 @@ from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
