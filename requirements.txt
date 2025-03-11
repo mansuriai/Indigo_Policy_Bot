@@ -13,5 +13,5 @@ redis>=4.5.0
 rank-bm25>=0.2.2 
 asyncio>=3.4.3
 boto3>=1.28.0
-pysqlite3-binary>=0.4.6
+pysqlite3-binary>=0.5.2
 streamlit-extras
