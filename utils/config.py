@@ -98,7 +98,7 @@ import os
 # os.environ['REQUESTS_CA_BUNDLE'] = ''
 from pathlib import Path
 from dotenv import load_dotenv
-# from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 load_dotenv()
 
 class Config:
@@ -113,9 +113,9 @@ class Config:
     DB_DIR.mkdir(parents=True, exist_ok=True)
     
     # Model settings
-    # EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
-    # EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
-    EMBEDDING_MODEL = str(MODEL_DIR)
+    EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
+    EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
+    # EMBEDDING_MODEL = str(MODEL_DIR)
     LLM_MODEL = "gpt-4o-mini"
     
     # Document processing
