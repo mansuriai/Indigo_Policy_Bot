@@ -106,16 +106,16 @@ class Config:
     BASE_DIR = Path(__file__).parent.parent
     DATA_DIR = BASE_DIR / "data"
     DB_DIR = BASE_DIR / "storage" / "vectordb"
-    MODEL_DIR = BASE_DIR / "models" / "all-mpnet-base-v2"   ####
+    # MODEL_DIR = BASE_DIR / "models" / "all-mpnet-base-v2"   ####
     
     # Create directories if they don't exist
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     DB_DIR.mkdir(parents=True, exist_ok=True)
     
     # Model settings
-    # EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
-    # EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
-    EMBEDDING_MODEL = str(MODEL_DIR)
+    EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
+    EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
+    # EMBEDDING_MODEL = str(MODEL_DIR)
     LLM_MODEL = "gpt-4o-mini"
     
     # Document processing
