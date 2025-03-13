@@ -113,9 +113,9 @@ class Config:
     DB_DIR.mkdir(parents=True, exist_ok=True)
     
     # Model settings
-    EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
-    EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
-    # EMBEDDING_MODEL = str(MODEL_DIR)
+    # EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
+    # EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
+    EMBEDDING_MODEL = str(MODEL_DIR)
     LLM_MODEL = "gpt-4o-mini"
     
     # Document processing
@@ -131,7 +131,7 @@ class Config:
     PINECONE_INDEX_NAME = "indigo-assistant" #os.getenv("PINECONE_INDEX_NAME", "indigo-assistant")
     
     # App settings
-    APP_TITLE = "Indigo Travel Assistant"
+    APP_TITLE = "GoAssist"
     MAX_HISTORY_LENGTH = 5
     
     # Vector DB settings
