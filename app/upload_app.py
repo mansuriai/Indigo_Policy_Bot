@@ -5,7 +5,7 @@ import time
 import os, sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from fix_ssl import *
+# from fix_ssl import *
 from utils.config import config
 from utils.s3_manager import S3Manager
 from core.document_processor import EnhancedDocumentProcessor

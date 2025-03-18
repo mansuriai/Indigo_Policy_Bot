@@ -29,16 +29,6 @@ class IndigoWebScraper:
             chunk_overlap=config.CHUNK_OVERLAP,
             length_function=len,
         )
-        
-        # Define target sections to scrape
-        # self.target_sections = {
-        #     "support": "/information/at-the-airport/airport-facilities.html",
-        #     "offers": "/deals-and-offers/6e-holiday-packages.html",
-        #     "terms_conditions": "/information/booking/terms-and-conditions.html",
-        #     "conditions_of_carriage": "/information/booking/conditions-of-carriage.html",
-        #     "travel_tips": "/information/travel-information/international-travel-tips.html",
-        #     "web_check_in": "/information/travel-information/web-check-in.html"
-        # }
 
         self.target_sections = {
             "offers": "https://www.goindigo.in/campaigns/indigo-offers.html",
@@ -64,8 +54,22 @@ class IndigoWebScraper:
             "charters_services": "https://www.goindigo.in/charters.html",
             "refund_claim": "https://www.goindigo.in/initiate-refund.html",
             "baggage": "https://www.goindigo.in/baggage.html",
+            "baggage_allowance": "https://www.goindigo.in/baggage/baggage-allowance.html",
+            "baggage_excess": "https://www.goindigo.in/baggage/excess-baggage.html",
+            "baggage_cabin": "https://www.goindigo.in/baggage/cabin-baggage.html",
+            # "baggage_track": "https://wtrweb.worldtracer.aero/WTRInternet/wtwflowinternet.do?_flowExecutionKey=_c2789311D-DDB4-10C5-9F26-F6C9BF3A496C_k50431363-5451-442E-9F60-1E1B924B95A7",
+            "baggage_lost": "https://www.goindigo.in/baggage/delay-lost-baggage.html",
+            "baggage_non_standard": "https://www.goindigo.in/baggage/special-baggage.html",
+            "baggage_things_not_allowed": "https://www.goindigo.in/baggage/dangerous-goods-policy.html",
+            "baggage_transfer": "https://www.goindigo.in/baggage/baggage-transfer.html",
+            "baggage_protection": "https://www.goindigo.in/add-on-services/delayed-and-lost-baggage-protection.html",
             "add_on_services": "https://www.goindigo.in/add-on-services.html",
+            "6e_prime": "https://www.goindigo.in/add-on-services/6e-prime.html",
+            "6e_cancellation_assist": "https://www.goindigo.in/add-on-services/free-cancellation-insurance.html",
             "6e_eat": "https://www.goindigo.in/add-on-services/food-menu.html",
+            "6e_blanket_eye_shade": "https://www.goindigo.in/add-on-services/blanket-pillow-eye-shade.html",
+            "6e_one_for_skies": "https://www.goindigo.in/add-on-services/6e-bar.html",
+            "6e_sports_equip": "https://www.goindigo.in/add-on-services/sports-equipment-handling-fees.html",
             "seat_select": "https://www.goindigo.in/add-on-services/seat-plus.html",
             "special_disability_assistance": "https://www.goindigo.in/information/special-disability-assistance.html",
             "plan_b": "https://www.goindigo.in/plan-b.html"

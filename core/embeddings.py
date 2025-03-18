@@ -6,18 +6,8 @@ from utils.config import config
 from typing import List
 
 class EmbeddingManager:
-    # def __init__(self):
-        # print(config.EMBEDDING_MODEL)
-        # self.model = HuggingFaceEmbeddings(
-        #     model_name=config.EMBEDDING_MODEL,
-        #     model_kwargs={'device': 'cpu'},
-        #     encode_kwargs={'normalize_embeddings': True}
-        # )
 
-    def __init__(self):
-        # os.environ['CURL_CA_BUNDLE'] = ''
-        # os.environ['REQUESTS_CA_BUNDLE'] = ''
-        # os.environ['HF_HUB_DISABLE_SSL_VERIFICATION'] = '1'
+    def __init__(self): 
 
         print(f"Loading model from: {config.EMBEDDING_MODEL}")
         self.model = HuggingFaceEmbeddings(
