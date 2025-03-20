@@ -135,7 +135,8 @@ class VectorStore:
                 self.logger.info(f"Creating Pinecone index: {config.PINECONE_INDEX_NAME}")
                 self.pc.create_index(
                     name=config.PINECONE_INDEX_NAME,
-                    dimension=768,  # Ensure this matches your embedding dimension
+                    # dimension=768,  # Ensure this matches your embedding dimension for allminiLM
+                    dimension=config.EMBEDDING_DIMENSION,  # Ensure this matches your embedding dimension for snowflake
                     metric='cosine',
                     spec=ServerlessSpec(
                         cloud='aws',

@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from core.web_scraper import IndigoWebScraper
 from core.embeddings import EmbeddingManager
 from core.vector_store import VectorStore
-from utils.config import config
+# from utils.config import config
 
 # Set up logging
 logging.basicConfig(

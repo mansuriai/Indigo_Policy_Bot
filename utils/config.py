@@ -113,8 +113,10 @@ class Config:
     DB_DIR.mkdir(parents=True, exist_ok=True)
     
     # Model settings
-    EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2")
-    EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
+    # EMBEDDING_MODEL = SentenceTransformer("all-mpnet-base-v2") ### wrong way
+
+    # EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2" #"multi-qa-mpnet-base-dot-v1"# "sentence-transformers/all-mpnet-base-v2"   
+    EMBEDDING_MODEL = "Snowflake/snowflake-arctic-embed-l-v2.0" 
     # EMBEDDING_MODEL = str(MODEL_DIR)
     LLM_MODEL = "gpt-4o-mini"
     
@@ -132,13 +134,13 @@ class Config:
     
     # App settings
     APP_TITLE = "GoAssist"
-    MAX_HISTORY_LENGTH = 5
+    MAX_HISTORY_LENGTH = 8
     
     # Vector DB settings
     COLLECTION_NAME = "indigo-documents"
     DISTANCE_METRIC = "cosine"
 
-    EMBEDDING_DIMENSION = 768  # Adjust based on your specific embedding model
+    EMBEDDING_DIMENSION = 1024  # Adjust based on your specific embedding model
     
     # Pinecone index settings
     PINECONE_INDEX_SPEC = {
