@@ -2,16 +2,17 @@
 from langchain_community.embeddings import HuggingFaceEmbeddings
 # from langchain_huggingface import HuggingFaceEmbeddings
 import os
-from utils.config import config
+# from utils.config import config
 from typing import List
 
 class EmbeddingManager:
 
     def __init__(self): 
 
-        print(f"Loading model from: {config.EMBEDDING_MODEL}")
+        # print(f"Loading model from: {config.EMBEDDING_MODEL}")
         self.model = HuggingFaceEmbeddings(
-            model_name=config.EMBEDDING_MODEL,
+            # model_name=config.EMBEDDING_MODEL,
+            model_name="Snowflake/snowflake-arctic-embed-l-v2.0",
             model_kwargs={'device': 'cpu'},
             encode_kwargs={'normalize_embeddings': True},
             # request_kwargs={"verify": False}  # Add this line to disable SSL verification
@@ -20,3 +21,8 @@ class EmbeddingManager:
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for a list of texts."""
         return self.model.embed_documents(texts)
+    
+
+
+    # EMBEDDING_MODEL = "Snowflake/snowflake-arctic-embed-l-v2.0" 
+    # EMBEDDING_DIMENSION = 1024 
