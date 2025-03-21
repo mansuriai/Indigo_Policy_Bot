@@ -18,6 +18,7 @@ class Config:
     DB_DIR.mkdir(parents=True, exist_ok=True)
     
     EMBEDDING_MODEL = "Snowflake/snowflake-arctic-embed-l-v2.0" 
+    EMBEDDING_DIMENSION = 1024  # Adjust based on your specific embedding model
     # EMBEDDING_MODEL = str(MODEL_DIR)
     LLM_MODEL = "gpt-4o-mini"
     
@@ -40,8 +41,6 @@ class Config:
     # Vector DB settings
     COLLECTION_NAME = "indigo-documents"
     DISTANCE_METRIC = "cosine"
-
-    EMBEDDING_DIMENSION = 1024  # Adjust based on your specific embedding model
     
     # Pinecone index settings
     PINECONE_INDEX_SPEC = {

@@ -9,10 +9,9 @@ from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
-
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.config import config
@@ -63,8 +62,6 @@ def initialize_components():
         
         # Verify Pinecone index exists and is accessible
         index = pc.Index(config.PINECONE_INDEX_NAME)
-        # index_stats = index.describe_index_stats()
-        # st.sidebar.write(f"Pinecone Index Stats: {index_stats.total_vector_count} vectors")
         
         return components
     except Exception as e:
@@ -106,12 +103,6 @@ if st.button("New Question"):
     st.session_state.current_sources = []
     st.rerun()
 
-# # Chat interface
-# user_input = render_chat_interface(
-#     st.session_state.chat_history,
-#     st.session_state.current_sources
-# )
-
 # Chat interface (simplified without source display)
 for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
@@ -134,21 +125,12 @@ if user_input:
         
         try:
             # Generate embedding for query
-            # st.write("Debug: Generating query embedding...")
             query_embedding = embedding_manager.generate_embeddings([user_input])[0]
-            # st.write(f"Debug: Embedding generated, shape: {len(query_embedding)}")
-            
-            # Search for relevant documents
-            # st.write("Debug: Searching for relevant documents...")
             relevant_docs = vector_store.search(
                 user_input,
                 query_embedding,
                 k=st.session_state.context_window
             )
-            # st.write(f"Debug: Found {len(relevant_docs)} relevant documents")
-            
-            # Generate streaming response
-            # st.write("Debug: Generating LLM response...")
 
             ## working
             response = llm_manager.generate_response(
@@ -157,23 +139,6 @@ if user_input:
                 st.session_state.chat_history[-st.session_state.max_history:],
                 streaming_container=response_placeholder
             )
-
-            ################ new with distance parameter #############
-            # Add this after retrieving relevant_docs:
-            # filtered_docs = [doc for doc in relevant_docs if doc['distance'] < 0.5]  # Lower distance = more similar
-            # if not filtered_docs:
-            #     response = "I don't have enough relevant information to answer your question accurately."
-            #     # Handle no relevant documents case
-            # else:
-            #     # Generate response using filtered_docs instead of relevant_docs
-            #     response = llm_manager.generate_response(
-            #         user_input,
-            #         filtered_docs,  # Use filtered docs here
-            #         st.session_state.chat_history[-st.session_state.max_history:],
-            #         streaming_container=response_placeholder
-            #     )
-
-
             
             # Update chat history and sources
             st.session_state.chat_history.append({
@@ -188,15 +153,3 @@ if user_input:
     
     # Rerun to update UI
     st.rerun()
-
-# Add a debug section in the sidebar
-# with st.sidebar:
-#     st.write("### Debug Information")
-#     if st.checkbox("Show Debug Info"):
-#         st.write("Pinecone Index:", config.PINECONE_INDEX_NAME)
-#         try:
-#             index = Pinecone.Index(config.PINECONE_INDEX_NAME)
-#             stats = index.describe_index_stats()
-#             st.write("Index Statistics:", stats)
-#         except Exception as e:
-#             st.error(f"Error fetching index stats: {str(e)}")

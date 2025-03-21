@@ -6,17 +6,14 @@ from chromadb.config import Settings
 import numpy as np
 import streamlit as st
 from utils.config import config
-# from utils.s3_manager import S3Manager
-import urllib3
-import ssl
 import requests
 import traceback
 import logging
 
 #################
 ## Please comment this line while working on local machine
-# import sys
-# sys.modules["sqlite3"] = __import__("pysqlite3")
+import sys
+sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 class VectorStore:
@@ -60,7 +57,7 @@ class VectorStore:
                 self.pc.create_index(
                     name=config.PINECONE_INDEX_NAME,
                     # dimension=768,  # Ensure this matches your embedding dimension for allminiLM
-                    dimension=config.EMBEDDING_DIMENSION,  # Ensure this matches your embedding dimension for snowflake
+                    dimension=1024, #config.EMBEDDING_DIMENSION,  # Ensure this matches your embedding dimension for snowflake
                     metric='cosine',
                     spec=ServerlessSpec(
                         cloud='aws',
