@@ -149,7 +149,9 @@ if user_input:
             
         except Exception as e:
             st.error(f"An error occurred during query processing: {str(e)}")
-            st.error("Full error details:", exc_info=True)
+            # st.error("Full error details:", exc_info=True)
+            st.error("Full error details:")
+            st.exception(e)  
     
     # Rerun to update UI
     st.rerun()
