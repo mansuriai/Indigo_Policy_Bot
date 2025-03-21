@@ -1,6 +1,5 @@
 from typing import List, Dict
 import asyncio
-# from utils.config import config
 
 class RetrievalOptimizer:
     def __init__(self, vector_store):

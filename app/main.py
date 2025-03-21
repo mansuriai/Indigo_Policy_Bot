@@ -9,8 +9,8 @@ from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
-import sys
-sys.modules["sqlite3"] = __import__("pysqlite3")
+# import sys
+# sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 
@@ -63,7 +63,7 @@ def initialize_components():
         
         # Verify Pinecone index exists and is accessible
         index = pc.Index(config.PINECONE_INDEX_NAME)
-        index_stats = index.describe_index_stats()
+        # index_stats = index.describe_index_stats()
         # st.sidebar.write(f"Pinecone Index Stats: {index_stats.total_vector_count} vectors")
         
         return components

@@ -25,18 +25,7 @@ class LLMManager:
             api_key=config.OPENAI_API_KEY,
             streaming=True
         )
-        
-        ## old working###########
-        # self.system_prompt = """You are an AI travel assistant designed to provide clear, concise, and precise answers. Use the provided context and entire chat history to ensure accurate responses. 
-        # Acknowledge when context is insufficient and avoid hallucinating. Always consider the user's intent from the conversation history.
-        
-        # Context: {context}
-        
-        # Chat History: {chat_history}
-        # """
 
-
-        ## new test ##
         self.system_prompt = """You are an AI travel assistant for IndiGo Airlines, designed to provide clear, concise, and precise answers to user queries. Your goal is to provide helpful information without unnecessary elaboration.
 
             IMPORTANT GUIDELINES:
