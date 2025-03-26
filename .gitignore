@@ -8,3 +8,5 @@ app_logs.log
 __pycache__/
 models/
 *.log
+0.4.6
+3.8.0test_model.py
