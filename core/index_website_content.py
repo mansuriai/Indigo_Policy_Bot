@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 from pathlib import Path
+from typing import Dict, List
 
 # Add parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -20,35 +21,46 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main():
-    """Main function to scrape and index website content."""
-    logger.info("Starting website content indexing")
+    """Main function to scrape and index website content with change detection."""
+    logger.info("Starting website content indexing with change detection")
     
     # Initialize components
     scraper = IndigoWebScraper()
     embedding_manager = EmbeddingManager()
     vector_store = VectorStore()
     
-    # Scrape all target sections
-    logger.info("Scraping website content...")
-    all_chunks = scraper.scrape_all_sections()
+    # Get existing content hashes to detect changes
+    existing_hashes = vector_store.get_existing_hashes()
+    logger.info(f"Found {len(existing_hashes)} existing sections in vector store")
     
-    if not all_chunks:
-        logger.error("No content was scraped from the website")
-        return
+    # Scrape with change detection
+    logger.info("Scraping website content with change detection...")
+    all_chunks, deleted_hashes = scraper.scrape_with_changes(existing_hashes)
     
-    logger.info(f"Successfully scraped {len(all_chunks)} chunks of content")
+    # Handle deleted content
+    if deleted_hashes:
+        deleted_count = vector_store.delete_by_parent_hash(deleted_hashes)
+        logger.info(f"Deleted {deleted_count} vectors from removed content")
     
-    # Generate embeddings
-    logger.info("Generating embeddings...")
-    embeddings = embedding_manager.generate_embeddings(
-        [chunk['text'] for chunk in all_chunks]
-    )
+    # Process new/updated content
+    if all_chunks:
+        logger.info(f"Processing {len(all_chunks)} new/updated chunks")
+        
+        # Generate embeddings only for changed content
+        logger.info("Generating embeddings for changed content...")
+        embeddings = embedding_manager.generate_embeddings(
+            [chunk['text'] for chunk in all_chunks]
+        )
+        
+        # Upload to vector database
+        logger.info("Uploading to vector database...")
+        vector_store.add_documents(all_chunks, embeddings)
+        
+        logger.info(f"Successfully indexed {len(all_chunks)} new/updated chunks")
+    else:
+        logger.info("No content changes detected - nothing to update")
     
-    # Upload to vector database
-    logger.info("Uploading to vector database...")
-    vector_store.add_documents(all_chunks, embeddings)
-    
-    logger.info("Website content indexing completed successfully")
+    logger.info("Website content indexing completed")
 
 if __name__ == "__main__":
     main()

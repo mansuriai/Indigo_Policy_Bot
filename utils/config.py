@@ -32,7 +32,7 @@ class Config:
     # Pinecone settings
     PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
     PINECONE_ENVIRONMENT = os.getenv("PINECONE_ENVIRONMENT", "gcp-starter")
-    PINECONE_INDEX_NAME = "indigo-assistant" #os.getenv("PINECONE_INDEX_NAME", "indigo-assistant")
+    PINECONE_INDEX_NAME = "indigo-assistant2" #os.getenv("PINECONE_INDEX_NAME", "indigo-assistant")
     
     # App settings
     APP_TITLE = "GoAssist"

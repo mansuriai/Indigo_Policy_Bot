@@ -1,11 +1,14 @@
-# core/web_scraper.py
+#### core/web_scraper.py
+
 import requests
 from bs4 import BeautifulSoup
 import time
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple, Set
 import logging
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
+import hashlib
+
 
 from utils.config import config
 from utils.helpers import generate_document_id
@@ -148,7 +151,7 @@ class IndigoWebScraper:
     def _get_page_content(self, url: str) -> Optional[str]:
         """Fetch content from a URL with error handling and rate limiting."""
         try:
-            full_url = urljoin(self.base_url, url)
+            full_url = url if url.startswith(('http://', 'https://')) else urljoin(self.base_url, url)
             logger.info(f"Fetching content from: {full_url}")
             
             # Rate limiting to be respectful to the website
@@ -161,28 +164,29 @@ class IndigoWebScraper:
         except requests.RequestException as e:
             logger.error(f"Error fetching {url}: {str(e)}")
             return None
-    
-    def _extract_content(self, html: str, section_name: str) -> Dict[str, Any]:
+
+    def _extract_content(self, html: str, section_name: str, url: str) -> Dict[str, Any]:
         """Extract relevant content from HTML based on section type."""
         soup = BeautifulSoup(html, 'html.parser')
         
-        # Find the main content area - this may need adjustments based on website structure
+        # Find the main content area
         content_area = soup.select_one('.content-area, .page-content, article, .main-content')
         
         if not content_area:
             logger.warning(f"Could not find main content area for {section_name}")
-            # Fallback to body
             content_area = soup.body
         
-        # Extract the text content
+        # Extract the text content and HTML for change detection
         content_text = content_area.get_text(separator='\n', strip=True)
+        content_html = str(content_area)
         
         # Create metadata
         metadata = {
             "source": f"indigo-website-{section_name}",
-            "url": urljoin(self.base_url, self.target_sections[section_name]),
+            "url": url,
             "section": section_name,
-            "scrape_timestamp": time.time()
+            "scrape_timestamp": time.time(),
+            "content_hash": hashlib.md5(content_html.encode()).hexdigest()  # For change detection
         }
         
         return {"text": content_text, "metadata": metadata}
@@ -192,7 +196,6 @@ class IndigoWebScraper:
         if not content or not content.get("text"):
             return []
         
-        # Split text into manageable chunks
         chunks = self.text_splitter.split_text(content["text"])
         
         processed_chunks = []
@@ -205,11 +208,48 @@ class IndigoWebScraper:
                     **content["metadata"],
                     "chunk_id": chunk_id,
                     "chunk_index": i,
-                    "total_chunks": len(chunks)
+                    "total_chunks": len(chunks),
+                    "parent_hash": content["metadata"]["content_hash"]  # Track which page this came from
                 }
             })
         
         return processed_chunks
+    
+    def scrape_with_changes(self, existing_hashes: Dict[str, str]) -> Tuple[List[Dict[str, Any]], List[str]]:
+        """
+        Scrape all sections and return:
+        - List of new/updated chunks
+        - List of parent hashes that no longer exist (indicating deleted content)
+        """
+        all_chunks = []
+        current_hashes = {}
+        deleted_hashes = []
+        
+        for section_name, url_path in self.target_sections.items():
+            html_content = self._get_page_content(url_path)
+            
+            if html_content:
+                content = self._extract_content(html_content, section_name, url_path)
+                current_hash = content["metadata"]["content_hash"]
+                current_hashes[section_name] = current_hash
+                
+                # Only process if content has changed or is new
+                if section_name not in existing_hashes or existing_hashes[section_name] != current_hash:
+                    chunks = self._process_content(content)
+                    all_chunks.extend(chunks)
+                    logger.info(f"Processed {len(chunks)} chunks from {section_name} (changed)")
+                else:
+                    logger.info(f"Skipping unchanged section: {section_name}")
+            else:
+                logger.warning(f"Failed to fetch content for {section_name}")
+        
+        # Detect deleted sections (present in existing_hashes but not in current scrape)
+        for section_name in existing_hashes:
+            if section_name not in current_hashes:
+                deleted_hashes.append(existing_hashes[section_name])
+                logger.info(f"Detected deleted section: {section_name}")
+        
+        return all_chunks, deleted_hashes
     
     def scrape_all_sections(self) -> List[Dict[str, Any]]:
         """Scrape all target sections and return processed chunks."""
@@ -219,7 +259,7 @@ class IndigoWebScraper:
             html_content = self._get_page_content(url_path)
             
             if html_content:
-                content = self._extract_content(html_content, section_name)
+                content = self._extract_content(html_content, section_name, url_path)
                 chunks = self._process_content(content)
                 all_chunks.extend(chunks)
                 
@@ -235,20 +275,55 @@ class IndigoWebScraper:
             logger.error(f"Unknown section: {section_name}")
             return []
         
-        html_content = self._get_page_content(self.target_sections[section_name])
+        url_path = self.target_sections[section_name]
+        html_content = self._get_page_content(url_path)
         
         if not html_content:
             return []
         
-        content = self._extract_content(html_content, section_name)
+        content = self._extract_content(html_content, section_name, url_path)
         chunks = self._process_content(content)
         
         return chunks
-
-
-
-
-
-
-
-
+        
+    def _find_and_follow_links(self, start_url: str, max_depth: int = 1, max_links: int = 10) -> List[str]:
+        """Find and follow links within the IndiGo website up to a certain depth."""
+        visited = set()
+        to_visit = [(start_url, 0)]  # (url, depth)
+        discovered_urls = []
+        
+        while to_visit and len(discovered_urls) < max_links:
+            current_url, depth = to_visit.pop(0)
+            
+            # Skip if already visited or max depth reached
+            if current_url in visited or depth > max_depth:
+                continue
+                
+            visited.add(current_url)
+            
+            # Get page content
+            html_content = self._get_page_content(current_url)
+            if not html_content:
+                continue
+                
+            # Add to discovered URLs
+            discovered_urls.append(current_url)
+            
+            # If at max depth, don't look for more links
+            if depth == max_depth:
+                continue
+                
+            # Parse links
+            soup = BeautifulSoup(html_content, 'html.parser')
+            for link in soup.find_all('a', href=True):
+                href = link['href']
+                
+                # Skip empty links, anchors, and external links
+                if not href or href.startswith('#'):
+                    continue
+                    
+                # Convert to absolute URL
+                if not href.startswith(('http://', 'https://')):
+                    href = urljoin(current_url, href)
+                
+                # Skip external links

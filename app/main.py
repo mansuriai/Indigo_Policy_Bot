@@ -9,8 +9,8 @@ from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
-import sys
-sys.modules["sqlite3"] = __import__("pysqlite3")
+# import sys
+# sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -25,7 +25,6 @@ st.set_page_config(
 from core.embeddings import EmbeddingManager
 from core.vector_store import VectorStore
 from core.llm import LLMManager
-# from components.chat import render_chat_interface
 
 def check_environment():
     """Check if all required environment variables are set."""
@@ -42,6 +41,27 @@ def check_environment():
         error_msg = f"Missing required environment variables: {', '.join(missing_vars)}\n"
         error_msg += "Please ensure these variables are set in your .env file or environment."
         raise ValueError(error_msg)
+
+def display_sources(sources: List[Dict]):
+    """Display sources with proper formatting and links."""
+    if not sources:
+        return
+    
+    with st.expander("📚 Source References", expanded=False):
+        for i, source in enumerate(sources, 1):
+            metadata = source.get('metadata', {})
+            url = metadata.get('url', '')
+            
+            st.markdown(f"### Reference {i}")
+            if url:
+                st.markdown(f"[🔗 {metadata.get('source', 'Source')}]({url})")
+            else:
+                st.markdown(f"**{metadata.get('source', 'Source')}**")
+            
+            # Show preview text
+            preview_text = source['text'][:300] + "..." if len(source['text']) > 300 else source['text']
+            st.caption(preview_text)
+            st.divider()
 
 # Update the initialize_components function
 @st.cache_resource
@@ -88,6 +108,8 @@ if "context_window" not in st.session_state:
     st.session_state.context_window = 5
 if "max_history" not in st.session_state:
     st.session_state.max_history = 10
+if "show_sources" not in st.session_state:
+    st.session_state.show_sources = False
 
 st.title(config.APP_TITLE)
 
@@ -96,17 +118,100 @@ Get answers to all your IndiGo Airlines related queries, from flight information
 travel tips, booking procedures and more.
 """)
 
+# Add sidebar controls
+# with st.sidebar:
+#     st.header("Settings")
+    
+#     # Control for context window size
+#     st.session_state.context_window = st.slider(
+#         "Context Window Size", 
+#         min_value=2, 
+#         max_value=10, 
+#         value=st.session_state.context_window,
+#         help="Number of relevant passages to use for answering questions"
+#     )
+    
+#     # Toggle to show sources
+#     st.session_state.show_sources = st.toggle(
+#         "Show Source Documents", 
+#         value=st.session_state.show_sources,
+#         help="Display the relevant source documents used to generate responses"
+#     )
+    
+#     # Button to start new conversation
+#     if st.button("New Conversation"):
+#         st.session_state.chat_history = []
+#         st.session_state.current_sources = []
+#         st.rerun()
 
-# Add button to start new conversation
-if st.button("New Question"):
+
+# Floating "New Conversation" Button at bottom-right
+st.markdown("""
+    <style>
+    .new-convo-button {
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+        z-index: 9999;
+    }
+    </style>
+    <div class="new-convo-button">
+        <form action="" method="post">
+            <button type="submit">🔄 New Conversation</button>
+        </form>
+    </div>
+""", unsafe_allow_html=True)
+
+# Clear session state on button click (handle post request)
+if st.session_state.get("reset_chat", False):
     st.session_state.chat_history = []
     st.session_state.current_sources = []
+    st.session_state.reset_chat = False
     st.rerun()
 
-# Chat interface (simplified without source display)
+# Use JS to detect button submit and set Streamlit state
+st.markdown("""
+    <script>
+    const form = document.querySelector('.new-convo-button form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        await fetch('', { method: 'POST' });
+        window.parent.postMessage({type: 'streamlit:setComponentValue', value: true}, '*');
+    });
+    </script>
+""", unsafe_allow_html=True)
+
+# # Add invisible Streamlit component to watch for JS trigger
+# import streamlit.components.v1 as components
+# value = components.html("""
+#     <script>
+#     window.addEventListener("message", (event) => {
+#         if (event.data.type === "streamlit:setComponentValue") {
+#             window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:rerunScript"}, "*");
+#         }
+#     });
+#     </script>
+# """, height=0)
+
+# # Set `reset_chat` flag so Streamlit knows to reset chat
+# st.session_state.reset_chat = True
+
+
+# Chat interface
 for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.write(message["content"])
+
+# Display sources if enabled
+if st.session_state.show_sources and st.session_state.current_sources:
+    with st.expander("Source Documents", expanded=False):
+        for i, source in enumerate(st.session_state.current_sources):
+            st.markdown(f"**Source {i+1}**")
+            st.write(source["text"])
+            if "metadata" in source and "url" in source["metadata"]:
+                st.markdown(f"[Link to source]({source['metadata']['url']})")
+            st.divider()
+
 
 # User input
 user_input = st.chat_input("Ask me anything about IndiGo Airlines...")
@@ -118,6 +223,10 @@ if user_input:
         "role": "user",
         "content": user_input
     })
+    
+    # Display user message
+    with st.chat_message("user"):
+        st.write(user_input)
     
     # Create a placeholder for the streaming response
     with st.chat_message("assistant"):
@@ -131,8 +240,11 @@ if user_input:
                 query_embedding,
                 k=st.session_state.context_window
             )
+            
+            # Save the current sources for potential display
+            st.session_state.current_sources = relevant_docs
 
-            ## working
+            # Generate response with enhanced LLM manager
             response = llm_manager.generate_response(
                 user_input,
                 relevant_docs,
@@ -140,18 +252,20 @@ if user_input:
                 streaming_container=response_placeholder
             )
             
-            # Update chat history and sources
+            # Display the response
+            response_placeholder.markdown(response)
+            
+            # Display sources separately
+            if st.session_state.show_sources:
+                display_sources(relevant_docs)
+
+            # Update chat history
             st.session_state.chat_history.append({
                 "role": "assistant",
                 "content": response
             })
-            st.session_state.current_sources = relevant_docs
             
         except Exception as e:
             st.error(f"An error occurred during query processing: {str(e)}")
-            # st.error("Full error details:", exc_info=True)
             st.error("Full error details:")
-            st.exception(e)  
-    
-    # Rerun to update UI
-    st.rerun()
+            st.exception(e)

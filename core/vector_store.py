@@ -1,20 +1,14 @@
-# core/vector_store.py
+# # core/vector_store.py
 from pinecone import Pinecone, ServerlessSpec
-from typing import List, Dict, Optional
-import chromadb
-from chromadb.config import Settings
+from typing import List, Dict, Optional, Set, Tuple
 import numpy as np
 import streamlit as st
 from utils.config import config
+import urllib3
+import ssl
 import requests
 import traceback
 import logging
-
-#################
-## Please comment this line while working on local machine
-import sys
-sys.modules["sqlite3"] = __import__("pysqlite3")
-####################
 
 class VectorStore:
 
@@ -56,8 +50,7 @@ class VectorStore:
                 self.logger.info(f"Creating Pinecone index: {config.PINECONE_INDEX_NAME}")
                 self.pc.create_index(
                     name=config.PINECONE_INDEX_NAME,
-                    # dimension=768,  # Ensure this matches your embedding dimension for allminiLM
-                    dimension=1024, #config.EMBEDDING_DIMENSION,  # Ensure this matches your embedding dimension for snowflake
+                    dimension=config.EMBEDDING_DIMENSION,
                     metric='cosine',
                     spec=ServerlessSpec(
                         cloud='aws',
@@ -79,16 +72,6 @@ class VectorStore:
         """Generate a cache key for a query."""
         return str(hash(query))
     
-    def _get_or_create_collection(self):
-        """Get existing collection or create new one."""
-        try:
-            return self.client.get_collection(config.COLLECTION_NAME)
-        except:
-            return self.client.create_collection(
-                name=config.COLLECTION_NAME,
-                metadata={"hnsw:space": config.DISTANCE_METRIC}
-            )
-
     def add_documents(self, documents: List[Dict[str, str]], embeddings: List[List[float]]):
         """Add documents and their embeddings to Pinecone with improved error handling."""
         try:
@@ -119,13 +102,8 @@ class VectorStore:
             raise
 
     def search(self, query: str, embedding: List[float], k: int = 3) -> List[Dict]:
-        """Search for similar documents in Pinecone with comprehensive error handling."""
+        """Enhanced search with better source handling."""
         try:
-            # Validate embedding
-            if not embedding or len(embedding) == 0:
-                raise ValueError("Invalid embedding: Empty or None")
-            
-            # Query Pinecone
             results = self.index.query(
                 vector=embedding,
                 top_k=k,
@@ -134,15 +112,81 @@ class VectorStore:
             
             processed_results = []
             for match in results.matches:
+                metadata = match.metadata or {}
+                
+                # Enhance metadata with heading information if available
+                if 'text' in metadata and 'headings' in metadata:
+                    text = metadata['text']
+                    for heading in metadata['headings']:
+                        if heading['text'].lower() in text.lower():
+                            metadata['url'] = f"{metadata.get('url', '')}#{heading['id']}"
+                            break
+                
                 processed_results.append({
-                    'text': match.metadata.get('text', ''),
-                    'metadata': {k: v for k, v in match.metadata.items() if k != 'text'},
-                    'distance': 1 - match.score  # Convert cosine similarity to distance
+                    'text': metadata.get('text', ''),
+                    'metadata': metadata,
+                    'distance': 1 - match.score
                 })
             
             return processed_results
+        except Exception as e:
+            self.logger.error(f"Search error: {str(e)}")
+            return []
+    
+    def get_existing_hashes(self) -> Dict[str, str]:
+        """Get a mapping of section names to content hashes for change detection."""
+        try:
+            # Query for metadata containing hash information
+            section_hashes = {}
+            
+            # Use a metadata filter to get distinct parent_hash values
+            results = self.index.query(
+                vector=[0.0] * config.EMBEDDING_DIMENSION,  # Dummy vector
+                top_k=1000,  # Get a large number to capture all sections
+                include_metadata=True,
+                filter={
+                    "section": {"$exists": True},
+                    "parent_hash": {"$exists": True}
+                }
+            )
+            
+            # Extract unique section to hash mappings
+            for match in results.matches:
+                if "section" in match.metadata and "parent_hash" in match.metadata:
+                    section = match.metadata["section"]
+                    parent_hash = match.metadata["parent_hash"]
+                    section_hashes[section] = parent_hash
+            
+            return section_hashes
             
         except Exception as e:
-            self.logger.error(f"Vector search error: {str(e)}")
-            self.logger.error(traceback.format_exc())
-            raise
+            self.logger.error(f"Error getting existing hashes: {str(e)}")
+            return {}
+    
+    def delete_by_parent_hash(self, parent_hashes: List[str]) -> int:
+        """Delete all vectors associated with specific parent hashes (deleted content)."""
+        try:
+            deleted_count = 0
+            
+            # Process in batches if there are many hashes
+            batch_size = 10
+            for i in range(0, len(parent_hashes), batch_size):
+                batch_hashes = parent_hashes[i:i + batch_size]
+                
+                # Create a filter for this batch of hashes
+                delete_filter = {
+                    "parent_hash": {"$in": batch_hashes}
+                }
+                
+                # Delete matching vectors
+                result = self.index.delete(filter=delete_filter)
+                
+                # Track the number of deleted items
+                if hasattr(result, 'deleted_count'):
+                    deleted_count += result.deleted_count
+                
+            return deleted_count
+            
+        except Exception as e:
+            self.logger.error(f"Error deleting vectors by parent hash: {str(e)}")
+            return 0
