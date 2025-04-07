@@ -11,7 +11,8 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils.config import config
 from utils.helpers import generate_document_id
-from langchain_community.embeddings import HuggingFaceEmbeddings
+# from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 class DocumentContent:
     """Class to represent different types of content in a document."""
@@ -21,14 +22,38 @@ class DocumentContent:
         self.page_num = page_num
         self.metadata = metadata or {}
 
+# class SmartChunker:
+#     """Handles intelligent chunking of different content types."""
+#     def __init__(self, embeddings_model: str = config.EMBEDDING_MODEL):
+#         self.embedder = HuggingFaceEmbeddings(
+#             model_name=embeddings_model,
+#             model_kwargs={'device': 'cpu'},
+#             encode_kwargs={'normalize_embeddings': True}
+#         )
+#         self.text_splitter = RecursiveCharacterTextSplitter(
+#             chunk_size=config.CHUNK_SIZE,
+#             chunk_overlap=config.CHUNK_OVERLAP,
+#             length_function=len,
+#         )
+
 class SmartChunker:
     """Handles intelligent chunking of different content types."""
     def __init__(self, embeddings_model: str = config.EMBEDDING_MODEL):
-        self.embedder = HuggingFaceEmbeddings(
-            model_name=embeddings_model,
-            model_kwargs={'device': 'cpu'},
-            encode_kwargs={'normalize_embeddings': True}
-        )
+        try:
+            self.embedder = HuggingFaceEmbeddings(
+                model_name=embeddings_model,
+                model_kwargs={'device': 'cpu'},
+                encode_kwargs={'normalize_embeddings': True}
+            )
+        except Exception as e:
+            print(f"Error initializing embedder in SmartChunker: {str(e)}")
+            # Fallback to a simpler model
+            self.embedder = HuggingFaceEmbeddings(
+                model_name="sentence-transformers/all-mpnet-base-v2",
+                model_kwargs={'device': 'cpu'},
+                encode_kwargs={'normalize_embeddings': True}
+            )
+            
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=config.CHUNK_SIZE,
             chunk_overlap=config.CHUNK_OVERLAP,

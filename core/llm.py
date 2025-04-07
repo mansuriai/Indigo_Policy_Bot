@@ -1,3 +1,5 @@
+# core/llm.py
+
 from typing import List, Dict, Optional, Tuple, Any
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate

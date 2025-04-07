@@ -15,6 +15,8 @@ asyncio>=3.4.3
 boto3>=1.28.0
 pysqlite3-binary>=0.5.2
 streamlit-extras
+langchain-huggingface>=0.0.3
+torch>=2.0.0
 
 # # Vector DBs and retrieval
 # pinecone

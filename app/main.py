@@ -64,24 +64,73 @@ def display_sources(sources: List[Dict]):
             st.divider()
 
 # Update the initialize_components function
+# @st.cache_resource
+# def initialize_components():
+#     try:
+#         # Check environment variables first
+#         check_environment()
+#         pc = Pinecone(
+#             api_key=config.PINECONE_API_KEY,
+#             environment=config.PINECONE_ENVIRONMENT
+#         )
+
+#         components = {
+#             'embedding_manager': EmbeddingManager(),
+#             'vector_store': VectorStore(),
+#             'llm_manager': LLMManager()
+#         }
+        
+#         # Verify Pinecone index exists and is accessible
+#         index = pc.Index(config.PINECONE_INDEX_NAME)
+        
+#         return components
+#     except Exception as e:
+#         st.error(f"Initialization Error: {str(e)}")
+#         st.info("Please check your .env file and ensure all required API keys are set correctly.")
+#         return None
+
 @st.cache_resource
 def initialize_components():
     try:
         # Check environment variables first
         check_environment()
-        pc = Pinecone(
-            api_key=config.PINECONE_API_KEY,
-            environment=config.PINECONE_ENVIRONMENT
-        )
-
-        components = {
-            'embedding_manager': EmbeddingManager(),
-            'vector_store': VectorStore(),
-            'llm_manager': LLMManager()
-        }
         
-        # Verify Pinecone index exists and is accessible
-        index = pc.Index(config.PINECONE_INDEX_NAME)
+        # Initialize Pinecone with better error handling
+        try:
+            pc = Pinecone(
+                api_key=config.PINECONE_API_KEY,
+                environment=config.PINECONE_ENVIRONMENT
+            )
+            # Verify Pinecone index exists and is accessible
+            index = pc.Index(config.PINECONE_INDEX_NAME)
+        except Exception as e:
+            st.error(f"Pinecone initialization error: {str(e)}")
+            return None
+            
+        # Initialize components one by one with better error handling
+        try:
+            embedding_manager = EmbeddingManager()
+        except Exception as e:
+            st.error(f"Embedding Manager Error: {str(e)}")
+            return None
+            
+        try:
+            vector_store = VectorStore()
+        except Exception as e:
+            st.error(f"Vector Store Error: {str(e)}")
+            return None
+            
+        try:
+            llm_manager = LLMManager()
+        except Exception as e:
+            st.error(f"LLM Manager Error: {str(e)}")
+            return None
+        
+        components = {
+            'embedding_manager': embedding_manager,
+            'vector_store': vector_store,
+            'llm_manager': llm_manager
+        }
         
         return components
     except Exception as e:
