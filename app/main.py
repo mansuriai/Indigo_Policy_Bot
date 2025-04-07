@@ -1,15 +1,25 @@
 # app/main.py
+
+# Add this FIRST (before any other imports)
+import asyncio
+import sys
+import os
+import warnings
+
+# Fix compatibility issues
+if sys.platform == "linux":
+    asyncio.set_event_loop_policy(asio.DefaultEventLoopPolicy())
+warnings.filterwarnings("ignore", category=UserWarning, module="torch._classes")
+
 import streamlit as st
 from pathlib import Path
 import time
 from typing import List, Dict
-import os, sys
 from urllib.parse import urlencode
 from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
-import sys
 sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
