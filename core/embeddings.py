@@ -12,7 +12,7 @@ class EmbeddingManager:
         self.model = HuggingFaceEmbeddings(
             model_name=config.EMBEDDING_MODEL,
             # model_name=config.EMBEDDING_MODEL,
-            model_kwargs={'device': 'cpu'},
+            model_kwargs={'device': 'cpu', "trust_remote_code": True },
             encode_kwargs={'normalize_embeddings': True},
         )
         # self.model = ArcticEmbeddings(model_name="Snowflake/snowflake-arctic-embed-l-v2.0")
