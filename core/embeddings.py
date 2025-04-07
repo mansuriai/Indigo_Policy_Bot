@@ -1,7 +1,7 @@
 # core/embeddings.py
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
-from snowflake_arctic_embed import ArcticEmbeddings
+# from snowflake_arctic_embed import ArcticEmbeddings
 from utils.config import config
 from typing import List
 
