@@ -1,15 +1,18 @@
 # app/main.py
 
 # Add this FIRST (before any other imports)
+import os
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'  # Add this line
+os.environ['HF_HUB_OFFLINE'] = '0'  # Ensure online mode
 import asyncio
 import sys
-import os
-import warnings
 
-# Fix compatibility issues
-if sys.platform == "linux":
-    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
-warnings.filterwarnings("ignore", category=UserWarning, module="torch._classes")
+# import warnings
+
+# # Fix compatibility issues
+# if sys.platform == "linux":
+#     asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+# warnings.filterwarnings("ignore", category=UserWarning, module="torch._classes")
 
 import streamlit as st
 from pathlib import Path

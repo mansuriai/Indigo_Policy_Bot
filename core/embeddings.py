@@ -8,6 +8,8 @@ from typing import List
 class EmbeddingManager:
     def __init__(self): 
         print(f"Loading model from: {config.EMBEDDING_MODEL}")
+        # Verify environment variable is set
+        assert 'HF_ENDPOINT' in os.environ, "HF_ENDPOINT not set!"
         # Make sure we're using the correct model with the right dimensions
         self.model = HuggingFaceEmbeddings(
             model_name=config.EMBEDDING_MODEL,
