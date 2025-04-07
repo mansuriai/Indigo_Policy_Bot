@@ -124,6 +124,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 import os
 from utils.config import config
 from typing import List
+from sentence_transformers import SentenceTransformer
 
 # class EmbeddingManager:
 #     def __init__(self): 
@@ -153,6 +154,14 @@ from typing import List
 class EmbeddingManager:
     def __init__(self): 
         print(f"Loading model from: {config.EMBEDDING_MODEL}")
+
+        
+
+        # Load the model
+        # model_name = config.EMBEDDING_MODEL #'Snowflake/snowflake-arctic-embed-l-v2.0'
+        model = SentenceTransformer(config.EMBEDDING_MODEL)
+        del model
+
         # Updated initialization with proper error handling
         try:
             self.model = HuggingFaceEmbeddings(
