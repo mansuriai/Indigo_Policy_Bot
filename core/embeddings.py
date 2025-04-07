@@ -1,6 +1,7 @@
 # core/embeddings.py
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
+from snowflake_arctic_embed import ArcticEmbeddings
 from utils.config import config
 from typing import List
 
@@ -8,12 +9,13 @@ class EmbeddingManager:
     def __init__(self): 
         print(f"Loading model from: {config.EMBEDDING_MODEL}")
         # Make sure we're using the correct model with the right dimensions
-        self.model = HuggingFaceEmbeddings(
-            model_name=config.EMBEDDING_MODEL,
-            model_kwargs={'device': 'cpu'},
-            encode_kwargs={'normalize_embeddings': True},
-        )
-        
+        # self.model = HuggingFaceEmbeddings(
+        #     model_name=config.EMBEDDING_MODEL,
+        #     # model_name=config.EMBEDDING_MODEL,
+        #     model_kwargs={'device': 'cpu'},
+        #     encode_kwargs={'normalize_embeddings': True},
+        # )
+        self.model = ArcticEmbeddings(model_name="Snowflake/snowflake-arctic-embed-l-v2.0")
         # Add a dimension check during initialization
         test_embedding = self.model.embed_documents(["Test dimension check"])
         if test_embedding and len(test_embedding[0]) != config.EMBEDDING_DIMENSION:
