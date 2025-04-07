@@ -2,8 +2,14 @@
 
 # Add this FIRST (before any other imports)
 import os
-os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'  # Add this line
-os.environ['HF_HUB_OFFLINE'] = '0'  # Ensure online mode
+import sys
+import torch
+
+# Prevent Streamlit from inspecting torch.classes (which causes crash)
+sys.modules['torch.classes'].__path__ = []
+
+# os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'  # Add this line
+# os.environ['HF_HUB_OFFLINE'] = '0'  # Ensure online mode
 import asyncio
 import sys
 
