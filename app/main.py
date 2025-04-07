@@ -8,7 +8,7 @@ import warnings
 
 # Fix compatibility issues
 if sys.platform == "linux":
-    asyncio.set_event_loop_policy(asio.DefaultEventLoopPolicy())
+    asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
 warnings.filterwarnings("ignore", category=UserWarning, module="torch._classes")
 
 import streamlit as st
