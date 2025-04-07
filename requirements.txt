@@ -19,4 +19,4 @@ asyncio>=3.4.3
 boto3>=1.28.0
 pysqlite3-binary>=0.5.2
 streamlit-extras
-snowflake-arctic-embed==0.1.0
+# snowflake-arctic-embed==0.1.0
