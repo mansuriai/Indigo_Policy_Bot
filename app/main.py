@@ -1,34 +1,15 @@
 # app/main.py
-
-# Add this FIRST (before any other imports)
-import os
-import sys
-import torch
-
-# Prevent Streamlit from inspecting torch.classes (which causes crash)
-sys.modules['torch.classes'].__path__ = []
-
-# os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'  # Add this line
-# os.environ['HF_HUB_OFFLINE'] = '0'  # Ensure online mode
-import asyncio
-import sys
-
-# import warnings
-
-# # Fix compatibility issues
-# if sys.platform == "linux":
-#     asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
-# warnings.filterwarnings("ignore", category=UserWarning, module="torch._classes")
-
 import streamlit as st
 from pathlib import Path
 import time
 from typing import List, Dict
+import os, sys
 from urllib.parse import urlencode
 from pinecone import Pinecone, ServerlessSpec
 
 #################
 # Please comment this line while working on local machine
+import sys
 sys.modules["sqlite3"] = __import__("pysqlite3")
 ####################
 
@@ -137,31 +118,6 @@ Get answers to all your IndiGo Airlines related queries, from flight information
 travel tips, booking procedures and more.
 """)
 
-# Add sidebar controls
-# with st.sidebar:
-#     st.header("Settings")
-    
-#     # Control for context window size
-#     st.session_state.context_window = st.slider(
-#         "Context Window Size", 
-#         min_value=2, 
-#         max_value=10, 
-#         value=st.session_state.context_window,
-#         help="Number of relevant passages to use for answering questions"
-#     )
-    
-#     # Toggle to show sources
-#     st.session_state.show_sources = st.toggle(
-#         "Show Source Documents", 
-#         value=st.session_state.show_sources,
-#         help="Display the relevant source documents used to generate responses"
-#     )
-    
-#     # Button to start new conversation
-#     if st.button("New Conversation"):
-#         st.session_state.chat_history = []
-#         st.session_state.current_sources = []
-#         st.rerun()
 
 
 # Floating "New Conversation" Button at bottom-right
@@ -199,21 +155,6 @@ st.markdown("""
     });
     </script>
 """, unsafe_allow_html=True)
-
-# # Add invisible Streamlit component to watch for JS trigger
-# import streamlit.components.v1 as components
-# value = components.html("""
-#     <script>
-#     window.addEventListener("message", (event) => {
-#         if (event.data.type === "streamlit:setComponentValue") {
-#             window.parent.postMessage({isStreamlitMessage: true, type: "streamlit:rerunScript"}, "*");
-#         }
-#     });
-#     </script>
-# """, height=0)
-
-# # Set `reset_chat` flag so Streamlit knows to reset chat
-# st.session_state.reset_chat = True
 
 
 # Chat interface
