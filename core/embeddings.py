@@ -126,80 +126,80 @@ from utils.config import config
 from typing import List
 from sentence_transformers import SentenceTransformer
 
-# class EmbeddingManager:
-#     def __init__(self): 
-#         print(f"Loading model from: {config.EMBEDDING_MODEL}")
-#         # Make sure we're using the correct model with the right dimensions
-#         self.model = HuggingFaceEmbeddings(
-#             model_name=config.EMBEDDING_MODEL,
-#             model_kwargs={'device': 'cpu'},
-#             encode_kwargs={'normalize_embeddings': True},
-#         )
-        
-#         # Add a dimension check during initialization
-#         test_embedding = self.model.embed_documents(["Test dimension check"])
-#         if test_embedding and len(test_embedding[0]) != config.EMBEDDING_DIMENSION:
-#             raise ValueError(f"Model produces embeddings with dimension {len(test_embedding[0])}, but config.EMBEDDING_DIMENSION is set to {config.EMBEDDING_DIMENSION}")
-    
-#     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
-#         """Generate embeddings for a list of texts."""
-#         embeddings = self.model.embed_documents(texts)
-        
-#         # Double-check dimensions before returning
-#         if embeddings and len(embeddings[0]) != config.EMBEDDING_DIMENSION:
-#             raise ValueError(f"Generated embeddings have dimension {len(embeddings[0])}, but expected {config.EMBEDDING_DIMENSION}")
-            
-#         return embeddings
-
 class EmbeddingManager:
     def __init__(self): 
         print(f"Loading model from: {config.EMBEDDING_MODEL}")
-
+        # Make sure we're using the correct model with the right dimensions
+        self.model = HuggingFaceEmbeddings(
+            model_name=config.EMBEDDING_MODEL,
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs={'normalize_embeddings': True},
+        )
         
-
-        # Load the model
-        # model_name = config.EMBEDDING_MODEL #'Snowflake/snowflake-arctic-embed-l-v2.0'
-        model = SentenceTransformer(config.EMBEDDING_MODEL)
-        del model
-
-        # Updated initialization with proper error handling
-        try:
-            self.model = HuggingFaceEmbeddings(
-                model_name=config.EMBEDDING_MODEL,
-                model_kwargs={'device': 'cpu'},
-                encode_kwargs={'normalize_embeddings': True},
-            )
-            
-            # Add a dimension check during initialization
-            test_embedding = self.model.embed_documents(["Test dimension check"])
-            if test_embedding and len(test_embedding[0]) != config.EMBEDDING_DIMENSION:
-                print(f"Warning: Model produces embeddings with dimension {len(test_embedding[0])}, but config.EMBEDDING_DIMENSION is set to {config.EMBEDDING_DIMENSION}")
-                # Update the dimension in config rather than raising an error
-                config.EMBEDDING_DIMENSION = len(test_embedding[0])
-        except Exception as e:
-            print(f"Error initializing embedding model: {str(e)}")
-            # Fallback to a simpler model if the main one fails
-            try:
-                # Use a more reliable, simpler embedding model as fallback
-                self.model = HuggingFaceEmbeddings(
-                    model_name="sentence-transformers/all-mpnet-base-v2",
-                    model_kwargs={'device': 'cpu'},
-                    encode_kwargs={'normalize_embeddings': True},
-                )
-                test_embedding = self.model.embed_documents(["Test dimension check"])
-                config.EMBEDDING_DIMENSION = len(test_embedding[0])
-                print(f"Using fallback model with dimension {config.EMBEDDING_DIMENSION}")
-            except Exception as e2:
-                raise RuntimeError(f"Failed to initialize embedding model: {str(e2)}")
+        # Add a dimension check during initialization
+        test_embedding = self.model.embed_documents(["Test dimension check"])
+        if test_embedding and len(test_embedding[0]) != config.EMBEDDING_DIMENSION:
+            raise ValueError(f"Model produces embeddings with dimension {len(test_embedding[0])}, but config.EMBEDDING_DIMENSION is set to {config.EMBEDDING_DIMENSION}")
     
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for a list of texts."""
-        try:
-            embeddings = self.model.embed_documents(texts)
-            return embeddings
-        except Exception as e:
-            print(f"Error generating embeddings: {str(e)}")
-            raise
+        embeddings = self.model.embed_documents(texts)
+        
+        # Double-check dimensions before returning
+        if embeddings and len(embeddings[0]) != config.EMBEDDING_DIMENSION:
+            raise ValueError(f"Generated embeddings have dimension {len(embeddings[0])}, but expected {config.EMBEDDING_DIMENSION}")
+            
+        return embeddings
+
+# class EmbeddingManager:
+#     def __init__(self): 
+#         print(f"Loading model from: {config.EMBEDDING_MODEL}")
+
+        
+
+#         # Load the model
+#         # model_name = config.EMBEDDING_MODEL #'Snowflake/snowflake-arctic-embed-l-v2.0'
+#         model = SentenceTransformer(config.EMBEDDING_MODEL)
+#         del model
+
+#         # Updated initialization with proper error handling
+#         try:
+#             self.model = HuggingFaceEmbeddings(
+#                 model_name=config.EMBEDDING_MODEL,
+#                 model_kwargs={'device': 'cpu'},
+#                 encode_kwargs={'normalize_embeddings': True},
+#             )
+            
+#             # Add a dimension check during initialization
+#             test_embedding = self.model.embed_documents(["Test dimension check"])
+#             if test_embedding and len(test_embedding[0]) != config.EMBEDDING_DIMENSION:
+#                 print(f"Warning: Model produces embeddings with dimension {len(test_embedding[0])}, but config.EMBEDDING_DIMENSION is set to {config.EMBEDDING_DIMENSION}")
+#                 # Update the dimension in config rather than raising an error
+#                 config.EMBEDDING_DIMENSION = len(test_embedding[0])
+#         except Exception as e:
+#             print(f"Error initializing embedding model: {str(e)}")
+#             # Fallback to a simpler model if the main one fails
+#             try:
+#                 # Use a more reliable, simpler embedding model as fallback
+#                 self.model = HuggingFaceEmbeddings(
+#                     model_name="sentence-transformers/all-mpnet-base-v2",
+#                     model_kwargs={'device': 'cpu'},
+#                     encode_kwargs={'normalize_embeddings': True},
+#                 )
+#                 test_embedding = self.model.embed_documents(["Test dimension check"])
+#                 config.EMBEDDING_DIMENSION = len(test_embedding[0])
+#                 print(f"Using fallback model with dimension {config.EMBEDDING_DIMENSION}")
+#             except Exception as e2:
+#                 raise RuntimeError(f"Failed to initialize embedding model: {str(e2)}")
+    
+#     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
+#         """Generate embeddings for a list of texts."""
+#         try:
+#             embeddings = self.model.embed_documents(texts)
+#             return embeddings
+#         except Exception as e:
+#             print(f"Error generating embeddings: {str(e)}")
+#             raise
 
 
 
