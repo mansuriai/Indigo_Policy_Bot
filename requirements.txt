@@ -40,6 +40,7 @@ pysqlite3-binary>=0.5.2
 streamlit-extras
 pymysql==1.1.0
 sqlalchemy==2.0.27
+langchain-openai
 # # Vector DBs and retrieval
 # pinecone
 # chromadb>=0.4.0
