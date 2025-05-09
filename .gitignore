@@ -4,6 +4,7 @@
 !*.py
 !*.txtutils/apikey.py
 .env
+feedback_data.json
 app_logs.log
 __pycache__/
 models/

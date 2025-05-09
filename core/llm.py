@@ -1,7 +1,8 @@
 # core/llm.py
 
 from typing import List, Dict, Optional, Tuple, Any
-from langchain_community.chat_models import ChatOpenAI
+# from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -24,7 +25,7 @@ class StreamHandler(BaseCallbackHandler):
 class LLMManager:
     def __init__(self):
         self.llm = ChatOpenAI(
-            model_name=config.LLM_MODEL,
+            model=config.LLM_MODEL,
             temperature=0.7,
             api_key=config.OPENAI_API_KEY,
             streaming=True
@@ -98,7 +99,7 @@ class LLMManager:
         
         # Non-streaming LLM for clarification assessment
         self.analysis_llm = ChatOpenAI(
-            model_name=config.LLM_MODEL,
+            model=config.LLM_MODEL,
             temperature=0.3,
             api_key=config.OPENAI_API_KEY,
             streaming=False

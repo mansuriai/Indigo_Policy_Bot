@@ -17,6 +17,13 @@ class Config:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     DB_DIR.mkdir(parents=True, exist_ok=True)
     
+    # SQL Database
+    DB_HOSTNAME = os.getenv("DB_HOSTNAME")
+    DB_NAME = os.getenv("DB_NAME")
+    DB_USERNAME = os.getenv("DB_USERNAME")
+    DB_PASSWORD = os.getenv("DB_PASSWORD")
+    DB_PORT = os.getenv("DB_PORT")
+
     EMBEDDING_MODEL = "Snowflake/snowflake-arctic-embed-l-v2.0" 
     # EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5" 
     # model_name = "Snowflake/snowflake-arctic-embed-l-v2.0"
