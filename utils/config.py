@@ -29,7 +29,7 @@ class Config:
     # model_name = "Snowflake/snowflake-arctic-embed-l-v2.0"
     EMBEDDING_DIMENSION = 1024  # Adjust based on your specific embedding model
     # EMBEDDING_MODEL = str(MODEL_DIR)
-    LLM_MODEL = "gpt-4o-mini"
+    LLM_MODEL = "gpt-4.1-mini"
     
     # Document processing
     CHUNK_SIZE = 1000

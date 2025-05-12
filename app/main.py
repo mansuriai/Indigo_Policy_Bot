@@ -1359,11 +1359,11 @@ def save_feedback(feedback_data, response=None):
             "liked_aspects": json.dumps(feedback_data.get("liked_aspects", [])),
             "other_liked": feedback_data.get("other_liked", ""),
             "improvement_suggestions": feedback_data.get("improvement_suggestions", ""),
-            "customer_experience": feedback_data.get("customer_experience", ""),
+            # "customer_experience": feedback_data.get("customer_experience", ""),  ##
             "usage_frequency": feedback_data.get("usage_frequency", ""),
             "issues": json.dumps(feedback_data.get("issues", [])),
             "other_feedback": feedback_data.get("other_feedback", ""),
-            "query_improvement": feedback_data.get("query_improvement", ""),
+            # "query_improvement": feedback_data.get("query_improvement", ""),   ##
             "timestamp": datetime.strptime(feedback_data["timestamp"], "%Y-%m-%dT%H:%M:%S.%f")
         }
         
@@ -1501,21 +1501,21 @@ def on_submit_positive():
     liked_aspects = st.session_state.liked_aspects if "liked_aspects" in st.session_state else []
     other_liked = st.session_state.other_liked if "other_liked" in st.session_state else ""
     improvement_suggestions = st.session_state.improvement_suggestions if "improvement_suggestions" in st.session_state else ""
-    query_share = st.session_state.query_share
-    customer_experience = st.session_state.customer_experience
-    usage_frequency = st.session_state.usage_frequency
+    # query_share = st.session_state.query_share      ### 
+    # customer_experience = st.session_state.customer_experience  ##
+    # usage_frequency = st.session_state.usage_frequency   ###
     
     feedback_data = {
         "feedback_type": "positive",
-        "query": st.session_state.latest_query if query_share == "Yes" else "Not shared",
+        # "query": st.session_state.latest_query if query_share == "Yes" else "Not shared",  ##
         "time_saved": time_saved,
         "rating": rating,
         "recommend": recommend,
         "liked_aspects": liked_aspects,
         "other_liked": other_liked,
         "improvement_suggestions": improvement_suggestions,
-        "customer_experience": customer_experience,
-        "usage_frequency": usage_frequency
+        # "customer_experience": customer_experience, ##
+        # "usage_frequency": usage_frequency    ###
     }
     
     # Save feedback with response
@@ -1555,22 +1555,22 @@ def on_submit_negative():
     rating = st.session_state.rating
     recommend = st.session_state.recommend
     improvement = st.session_state.improvement if "improvement" in st.session_state else ""
-    query_improvement = st.session_state.query_improvement if "query_improvement" in st.session_state else ""
-    query_share = st.session_state.query_share
-    customer_experience = st.session_state.customer_experience
-    usage_frequency = st.session_state.usage_frequency
+    # query_improvement = st.session_state.query_improvement if "query_improvement" in st.session_state else "" ##
+    # query_share = st.session_state.query_share     ##
+    # customer_experience = st.session_state.customer_experience   ##
+    # usage_frequency = st.session_state.usage_frequency     #
     
     feedback_data = {
         "feedback_type": "negative",
-        "query": st.session_state.latest_query if query_share == "Yes" else "Not shared",
+        # "query": st.session_state.latest_query if query_share == "Yes" else "Not shared",  ##
         "issues": issues,
         "other_feedback": other_feedback,
         "rating": rating,
         "recommend": recommend,
         "improvement_suggestions": improvement,
-        "query_improvement": query_improvement,
-        "customer_experience": customer_experience,
-        "usage_frequency": usage_frequency
+        # "query_improvement": query_improvement,    ##
+        # "customer_experience": customer_experience,   ##
+        # "usage_frequency": usage_frequency          #
     }
     
     # Save feedback with response
@@ -1778,7 +1778,7 @@ if st.session_state.show_feedback and not st.session_state.feedback_submitted:
         st.slider("Rate the AI Assistant's response (1-10)", 1, 10, 7, key="rating")
         
         st.radio(
-            "Would you recommend this AI Assistant to other agents?",
+            "Would you recommend this AI Assistant to other friends?",
             ["Yes", "No"],
             index=0,
             key="recommend"
@@ -1797,26 +1797,26 @@ if st.session_state.show_feedback and not st.session_state.feedback_submitted:
         
         st.text_area("Any suggestions for improvement? (Optional)", key="improvement_suggestions")
         
-        st.radio(
-            "Would you be willing to share your original query for system improvement?",
-            ["Yes", "No"],
-            index=0,
-            key="query_share"
-        )
+        # st.radio(
+        #     "Would you be willing to share your original query for system improvement?",
+        #     ["Yes", "No"],
+        #     index=0,
+        #     key="query_share"
+        # )
         
-        st.radio(
-            "Did using the AI Assistant help improve the customer's experience?",
-            ["Yes", "No"],
-            index=0,
-            key="customer_experience"
-        )
+        # st.radio(
+        #     "Did using the AI Assistant help improve the customer's experience?",
+        #     ["Yes", "No"],
+        #     index=0,
+        #     key="customer_experience"
+        # )
         
-        st.selectbox(
-            "How often do you use the AI Assistant during customer calls?",
-            ["Daily, multiple times per day", "A few times per week", "Rarely", "This is my first time"],
-            index=0,
-            key="usage_frequency"
-        )
+        # st.selectbox(
+        #     "How often do you use the AI Assistant during customer calls?",
+        #     ["Daily, multiple times per day", "A few times per week", "Rarely", "This is my first time"],
+        #     index=0,
+        #     key="usage_frequency"
+        # )
         
         st.button("Submit Feedback", key="submit_positive", on_click=on_submit_positive)
         
@@ -1840,7 +1840,7 @@ if st.session_state.show_feedback and not st.session_state.feedback_submitted:
         st.slider("Rate the AI Assistant's response (1-10)", 1, 10, 3, key="rating")
         
         st.radio(
-            "Would you recommend this AI Assistant to other agents?",
+            "Would you recommend this AI Assistant to other friends?",
             ["Yes", "No"],
             index=1,
             key="recommend"
@@ -1848,28 +1848,28 @@ if st.session_state.show_feedback and not st.session_state.feedback_submitted:
         
         st.text_area("What would have made this response more helpful? (Optional)", key="improvement")
         
-        st.text_area("Is there a specific type of query where the AI Assistant needs improvement? (Optional)", key="query_improvement")
+        # st.text_area("Is there a specific type of query where the AI Assistant needs improvement? (Optional)", key="query_improvement")
         
-        st.radio(
-            "Would you be willing to share your original query for system improvement?",
-            ["Yes", "No"],
-            index=0,
-            key="query_share"
-        )
+        # st.radio(
+        #     "Would you be willing to share your original query for system improvement?",
+        #     ["Yes", "No"],
+        #     index=0,
+        #     key="query_share"
+        # )
         
-        st.radio(
-            "Did using the AI Assistant affect the customer's experience?",
-            ["Improved", "No effect", "Worsened"],
-            index=1,
-            key="customer_experience"
-        )
+        # st.radio(
+        #     "Did using the AI Assistant affect the customer's experience?",
+        #     ["Improved", "No effect", "Worsened"],
+        #     index=1,
+        #     key="customer_experience"
+        # )
         
-        st.selectbox(
-            "How often do you use the AI Assistant during customer calls?",
-            ["Daily, multiple times per day", "A few times per week", "Rarely", "This is my first time"],
-            index=0,
-            key="usage_frequency"
-        )
+        # st.selectbox(
+        #     "How often do you use the AI Assistant during customer calls?",
+        #     ["Daily, multiple times per day", "A few times per week", "Rarely", "This is my first time"],
+        #     index=0,
+        #     key="usage_frequency"
+        # )
         
         st.button("Submit Feedback", key="submit_negative", on_click=on_submit_negative)
         
